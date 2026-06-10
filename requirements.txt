@@ -1,3 +1,16 @@
 requests
 langchain
 langchain-ollama
+
+fastapi
+uvicorn[standard]
+
+pydantic
+python-dotenv
+
+langgraph
+langgraph-checkpoint
+
+pytest
+pytest-cov
+httpx

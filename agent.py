@@ -1,9 +1,15 @@
-from langchain.agents import create_agent
+from unittest import result
+
+from langgraph.prebuilt import create_react_agent
+from langgraph.checkpoint.memory import MemorySaver
 from langchain_ollama import ChatOllama
 
 from constants import DEFAULT_MODEL
 from tools import get_current_weather, get_weather_forecast
 
+from pathlib import Path
+
+SYSTEM_PROMPT = Path("prompts/system_prompt.md").read_text()
 
 def build_weather_agent():
     """
@@ -15,65 +21,60 @@ def build_weather_agent():
         temperature=0,
     )
 
-    agent = create_agent(
+    memory = MemorySaver()
+
+    agent = create_react_agent(
         model=model,
         tools=[
             get_current_weather,
             get_weather_forecast,
         ],
-        system_prompt=(
-            "You are a practical weather assistant. "
-            "Use get_current_weather for current weather questions. "
-            "Use get_weather_forecast for forecast, tomorrow, weekend, or planning questions. "
-            "Answer directly. Include Celsius temperature, apparent temperature, humidity, "
-            "precipitation, wind, and condition when available."
-        ),
+        checkpointer=memory,
+        prompt=SYSTEM_PROMPT,
     )
 
     return agent
 
 
-def ask_agent(agent, question: str) -> str:
-    """
-    Send a user question to the agent and return the final response.
-    """
+
+def ask_agent(
+    agent,
+    session_id: str,
+    question: str
+):
 
     result = agent.invoke(
         {
             "messages": [
                 {
                     "role": "user",
-                    "content": question,
+                    "content": question
                 }
             ]
+        },
+        config={
+            "configurable": {
+                "thread_id": session_id
+            }
         }
     )
 
-    return result["messages"][-1].content
+    messages = result.get("messages", [])
 
+    if not messages:
+        return "No response generated."
 
-def main():
-    agent = build_weather_agent()
+    last_message = messages[-1]
 
-    print("Weather Agent")
-    print("Type 'exit' or 'quit' to stop.")
+    # LangGraph AIMessage
+    if hasattr(last_message, "content"):
+        return last_message.content
 
-    while True:
-        question = input("\nAsk: ").strip()
+    # Mocked dictionary
+    if isinstance(last_message, dict):
+        return last_message.get(
+            "content",
+            ""
+        )
 
-        if question.lower() in {"exit", "quit"}:
-            break
-
-        if not question:
-            continue
-
-        try:
-            answer = ask_agent(agent, question)
-            print("\nAgent:", answer)
-
-        except Exception as error:
-            print("\nError:", error)
-
-
-if __name__ == "__main__":
-    main()
+    return str(last_message)
