@@ -353,13 +353,6 @@ Current implementation:
 LangGraph MemorySaver
 ```
 
-Future upgrade options:
-
-```text
-PostgreSQL Checkpointer
-Redis Checkpointer
-```
-
 ---
 
 # How It Works
@@ -521,34 +514,6 @@ Verify:
 
 ```bash
 uvicorn app:app --reload
-```
-
----
-
-# Git Commands
-
-Status:
-
-```bash
-git status
-```
-
-Stage:
-
-```bash
-git add .
-```
-
-Commit:
-
-```bash
-git commit -m "Update weather agent"
-```
-
-Push:
-
-```bash
-git push origin main
 ```
 
 ---
