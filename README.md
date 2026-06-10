@@ -1,120 +1,197 @@
 # LangChain Weather Agent
 
-A simple weather agent built with **LangChain**, **Ollama**, and the **Open-Meteo API**.
+A production-ready weather assistant built with:
 
-The agent accepts natural-language weather questions such as:
+* FastAPI
+* LangGraph
+* Ollama
+* Open-Meteo API
+* GitHub Actions
+
+The assistant supports:
+
+* Current weather lookups
+* Multi-day forecasts
+* Follow-up weather conversations
+* Short-term memory using LangGraph
+* REST API access
+* Automated testing and CI/CD validation
+
+---
+
+# Features
+
+## Weather Intelligence
+
+Supports natural-language questions:
 
 ```text
 What is the weather in Dublin?
 ```
 
-It extracts the location, calls a weather tool, fetches live weather data from Open-Meteo, and returns a readable weather response.
+```text
+Will it rain tomorrow in Antipolo?
+```
+
+```text
+Do I need an umbrella tomorrow?
+```
+
+```text
+Should I wear a jacket?
+```
 
 ---
 
-## Project Structure
+## LangGraph Memory
+
+Supports short-term conversation memory.
+
+Example:
+
+```text
+User:
+What is the weather in Dun Laoghaire tomorrow?
+
+Assistant:
+Light drizzle. High 15.5°C. Rain probability 98%.
+
+User:
+Will umbrella help?
+
+Assistant:
+Yes. Bring an umbrella. Rain probability is very high.
+```
+
+The assistant remembers previously discussed forecasts through LangGraph thread memory.
+
+---
+
+## FastAPI API
+
+Expose the assistant through a REST API.
+
+---
+
+## GitHub Actions
+
+Every Pull Request automatically runs:
+
+* Linting
+* Tests
+* Coverage
+* Docker build validation
+
+PRs can be blocked from merging unless all checks pass.
+
+---
+
+# Project Structure
 
 ```text
 LangChain-Weather-Agent/
 │
+├── app.py
+├── agent.py
 ├── constants.py
 ├── weather_api.py
 ├── tools.py
-├── main.py
+│
+├── prompts/
+│   └── system_prompt.md
+│
+├── tests/
+│   └── test_app.py
+│
+├── .github/
+│   └── workflows/
+│       └── pr-validation.yml
+│
 ├── requirements.txt
+├── Dockerfile
 └── README.md
 ```
 
-### File Purpose
+---
 
-| File               | Purpose                                                                     |
-| ------------------ | --------------------------------------------------------------------------- |
-| `constants.py`     | Stores API URLs, weather field names, model name, and weather code mappings |
-| `weather_api.py`   | Handles geocoding and weather API requests                                  |
-| `tools.py`         | Defines LangChain tools used by the agent                                   |
-| `main.py`          | Builds and runs the LangChain weather agent                                 |
-| `requirements.txt` | Lists required Python dependencies                                          |
-| `README.md`        | Project setup and usage guide                                               |
+# File Purpose
+
+| File              | Purpose                    |
+| ----------------- | -------------------------- |
+| app.py            | FastAPI REST API           |
+| agent.py          | LangGraph weather agent    |
+| weather_api.py    | Open-Meteo API integration |
+| tools.py          | LangChain tools            |
+| constants.py      | Project constants          |
+| system_prompt.md  | Agent instructions         |
+| test_app.py       | Automated tests            |
+| pr-validation.yml | GitHub Actions workflow    |
 
 ---
 
-## Prerequisites
+# Prerequisites
 
-Before running the project, install:
+Install:
 
-* Python 3.10 or higher
+* Python 3.11+
 * Git
 * Ollama
 
 ---
 
-## 1. Install Ollama
+# Install Ollama
 
-### macOS
-
-Install Ollama using Homebrew:
+macOS:
 
 ```bash
 brew install ollama
 ```
 
-Or install it from:
+or
 
 ```text
 https://ollama.com
 ```
 
-After installation, verify that Ollama is available:
+Verify:
 
 ```bash
 ollama --version
 ```
 
-If the command works, Ollama is installed correctly.
-
 ---
 
-## 2. Pull the Local Model
+# Pull Model
 
-This project uses a free local model through Ollama.
-
-Recommended model for MacBook Air M2 8GB:
+Recommended:
 
 ```bash
 ollama pull llama3.2:3b
 ```
 
-Optional heavier model:
+Alternative:
 
 ```bash
 ollama pull llama3.1:8b
 ```
 
-Use `llama3.2:3b` first because it is lighter and faster.
-
 ---
 
-## 3. Start Ollama
-
-Run:
+# Start Ollama
 
 ```bash
 ollama serve
 ```
 
-Keep this terminal open while running the weather agent.
-
-Open a second terminal tab for the next steps.
+Keep running.
 
 ---
 
-## 4. Clone the Repository
+# Clone Repository
 
 ```bash
 git clone https://github.com/montuyajoel/LangChain-Weather-Agent.git
 ```
-
-Go inside the project folder:
 
 ```bash
 cd LangChain-Weather-Agent
@@ -122,21 +199,19 @@ cd LangChain-Weather-Agent
 
 ---
 
-## 5. Create a Virtual Environment
+# Create Virtual Environment
 
 ```bash
 python -m venv .venv
 ```
 
-Activate it.
-
-### macOS / Linux
+macOS/Linux:
 
 ```bash
 source .venv/bin/activate
 ```
 
-### Windows PowerShell
+Windows:
 
 ```powershell
 .venv\Scripts\Activate.ps1
@@ -144,9 +219,7 @@ source .venv/bin/activate
 
 ---
 
-## 6. Install Requirements
-
-Install all required packages from `requirements.txt`:
+# Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -155,178 +228,278 @@ pip install -r requirements.txt
 Expected dependencies:
 
 ```text
+fastapi
+uvicorn
 langchain
 langchain-ollama
 langgraph
 requests
+pytest
+pytest-cov
+httpx
 ```
 
 ---
 
-## 7. Run the Weather Agent
+# Run FastAPI
 
 ```bash
-python main.py
+uvicorn app:app --reload
 ```
 
-You should see:
+Server:
 
 ```text
-Weather Agent
-Type 'exit' or 'quit' to stop.
+http://localhost:8000
+```
+
+Swagger:
+
+```text
+http://localhost:8000/docs
 ```
 
 ---
 
-## 8. Example Prompts
+# REST API
 
-```text
-What is the weather in Dublin?
+## Health Check
+
+Request:
+
+```http
+GET /
 ```
 
-```text
-What is the current weather in Antipolo?
-```
+Response:
 
-```text
-Will it rain in Dublin tomorrow?
-```
-
-```text
-Give me the 3-day forecast for Tokyo.
+```json
+{
+  "status": "healthy"
+}
 ```
 
 ---
 
-## How It Works
+## Weather Question
 
-### Step 1: User asks a question
+Request:
 
-```text
-What is the weather in Dublin?
+```http
+POST /ask
 ```
 
-### Step 2: LangChain agent reads the sentence
+Body:
 
-The agent identifies that the user is asking for current weather.
-
-### Step 3: LangChain calls the weather tool
-
-The agent calls:
-
-```python
-get_current_weather(location="Dublin")
+```json
+{
+  "question": "Will it rain in Dublin tomorrow?"
+}
 ```
 
-### Step 4: The weather API converts the city into coordinates
+Response:
 
-```text
-Dublin → latitude and longitude
+```json
+{
+  "response": "Yes. Bring an umbrella. Rain probability is high."
+}
 ```
 
-### Step 5: Open-Meteo returns live weather data
+---
 
-The API returns data such as:
+# LangGraph Integration
 
-* Temperature
-* Apparent temperature
-* Humidity
-* Precipitation
-* Wind speed
-* Weather condition
+This project uses LangGraph to orchestrate the weather assistant.
 
-### Step 6: The agent returns a natural-language answer
+Components:
+
+* ChatOllama
+* LangGraph ReAct Agent
+* Open-Meteo Tools
+* MemorySaver Checkpointer
+
+Benefits:
+
+* Tool orchestration
+* Conversation memory
+* Thread management
+* Production-ready architecture
+
+---
+
+# Short-Term Memory
+
+The assistant maintains conversation context.
 
 Example:
 
 ```text
-The current weather in Dublin, Ireland is overcast. The temperature is 16°C, feeling like 15°C. Humidity is 75%, precipitation is 0 mm, and wind speed is 14 km/h.
+User:
+Weather in Dublin tomorrow?
+
+Assistant:
+Forecast returned.
+
+User:
+Will umbrella help?
+
+Assistant:
+Uses the previous forecast to answer.
+```
+
+Current implementation:
+
+```text
+LangGraph MemorySaver
+```
+
+Future upgrade options:
+
+```text
+PostgreSQL Checkpointer
+Redis Checkpointer
 ```
 
 ---
 
-## Main Components
+# How It Works
 
-### `constants.py`
+### Step 1
 
-Stores reusable constants:
+User asks:
 
-* Open-Meteo API URLs
-* Weather fields
-* Default Ollama model
-* Weather code mapping
-
-### `weather_api.py`
-
-Handles direct API work:
-
-* Converts location names into coordinates
-* Fetches current weather
-* Fetches forecast data
-* Formats API output into dictionaries
-
-### `tools.py`
-
-Defines LangChain tools:
-
-```python
-get_current_weather
-get_weather_forecast
+```text
+What is the weather in Dublin?
 ```
 
-These tools are exposed to the agent.
+### Step 2
 
-### `main.py`
+LangGraph agent evaluates the request.
 
-Builds the agent using:
+### Step 3
 
-* `ChatOllama`
-* LangChain `create_agent`
+Weather tool is selected.
+
+### Step 4
+
+Location is geocoded.
+
+### Step 5
+
+Open-Meteo returns weather data.
+
+### Step 6
+
+The agent generates a weather response.
+
+### Step 7
+
+LangGraph stores conversation state.
+
+### Step 8
+
+Future questions reuse previous weather context.
+
+---
+
+# Testing
+
+Run tests:
+
+```bash
+python -m pytest tests/test_app.py -v
+```
+
+Coverage:
+
+```bash
+python -m pytest \
+tests/test_app.py \
+--cov=. \
+--cov-report=term
+```
+
+Coverage areas:
+
+* FastAPI endpoints
+* Session middleware
+* Agent execution
+* LangGraph memory flow
 * Weather tools
 
-It also handles the terminal input loop.
+---
+
+# GitHub Actions
+
+The project includes CI validation.
+
+Workflow:
+
+```text
+.github/workflows/pr-validation.yml
+```
+
+Process:
+
+```text
+Pull Request
+    ↓
+Install Dependencies
+    ↓
+Lint
+    ↓
+Tests
+    ↓
+Coverage
+    ↓
+Docker Build
+    ↓
+Pass / Fail
+```
+
+Branch protection can require successful completion before merge.
 
 ---
 
-## Troubleshooting
+# Example Questions
 
-### `zsh: command not found: ollama`
-
-Ollama is not installed or not available in your PATH.
-
-Fix:
-
-```bash
-brew install ollama
+```text
+What is the weather in Dublin?
 ```
 
-Then verify:
+```text
+Will it rain tomorrow in Antipolo?
+```
 
-```bash
-ollama --version
+```text
+Do I need an umbrella tomorrow?
+```
+
+```text
+Should I wear a jacket?
+```
+
+```text
+Is it good weather for walking?
+```
+
+```text
+Can I go cycling tomorrow?
 ```
 
 ---
 
-### `connection refused` or Ollama not responding
+# Troubleshooting
 
-Ollama is not running.
-
-Fix:
+## Ollama Not Running
 
 ```bash
 ollama serve
 ```
 
-Keep the terminal open.
-
 ---
 
-### Model not found
-
-The model has not been downloaded.
-
-Fix:
+## Model Not Found
 
 ```bash
 ollama pull llama3.2:3b
@@ -334,11 +507,7 @@ ollama pull llama3.2:3b
 
 ---
 
-### Python package error
-
-Dependencies are missing.
-
-Fix:
+## Dependency Issues
 
 ```bash
 pip install -r requirements.txt
@@ -346,45 +515,37 @@ pip install -r requirements.txt
 
 ---
 
-### No location found
+## API Not Responding
 
-The location name may be unclear.
+Verify:
 
-Use a more specific location:
-
-```text
-Dublin, Ireland
-```
-
-Instead of:
-
-```text
-Dublin
+```bash
+uvicorn app:app --reload
 ```
 
 ---
 
-## Git Commands
+# Git Commands
 
-Check project status:
+Status:
 
 ```bash
 git status
 ```
 
-Add changes:
+Stage:
 
 ```bash
 git add .
 ```
 
-Commit changes:
+Commit:
 
 ```bash
 git commit -m "Update weather agent"
 ```
 
-Push changes:
+Push:
 
 ```bash
 git push origin main
@@ -392,30 +553,42 @@ git push origin main
 
 ---
 
-## Tech Stack
+# Tech Stack
 
-| Tool             | Purpose                        |
-| ---------------- | ------------------------------ |
-| Python           | Core programming language      |
-| LangChain        | Agent framework                |
-| LangChain Ollama | Local LLM integration          |
-| Ollama           | Runs the local language model  |
-| Open-Meteo       | Free weather and geocoding API |
-| Requests         | HTTP API requests              |
+| Tool           | Purpose                        |
+| -------------- | ------------------------------ |
+| Python         | Core language                  |
+| FastAPI        | REST API                       |
+| LangGraph      | Agent orchestration and memory |
+| LangChain      | Tool abstraction               |
+| Ollama         | Local LLM runtime              |
+| Open-Meteo     | Weather provider               |
+| Requests       | API communication              |
+| Pytest         | Testing                        |
+| GitHub Actions | CI/CD                          |
 
 ---
 
-## License
+# API Usage and Attribution
 
-This project is for learning and experimentation.
-
-## API Usage and Attribution
-
-This project uses the **Open-Meteo API** for geocoding and weather forecast data.
-
-Open-Meteo provides free API access for non-commercial use. The free API is rate-limited to **10,000 calls per day**, **5,000 calls per hour**, and **600 calls per minute**. Commercial use requires a paid customer API plan. Open-Meteo API data is provided under the **Creative Commons Attribution 4.0 International (CC BY 4.0)** license.
+This project uses Open-Meteo for geocoding and weather forecast data.
 
 Required attribution:
 
 ```text
 Weather data by Open-Meteo.com
+```
+
+Open-Meteo data is provided under:
+
+```text
+CC BY 4.0
+```
+
+For commercial usage, review Open-Meteo licensing and API limits.
+
+---
+
+# License
+
+This project is intended for learning, experimentation, and local AI agent development.

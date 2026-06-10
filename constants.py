@@ -1,7 +1,7 @@
 OPEN_METEO_GEOCODING_URL = "https://geocoding-api.open-meteo.com/v1/search"
 OPEN_METEO_FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
 
-DEFAULT_MODEL = "llama3.1:8b"
+DEFAULT_MODEL = "llama3.2:3b"
 
 CURRENT_WEATHER_FIELDS = [
     "temperature_2m",
