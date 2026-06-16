@@ -567,6 +567,166 @@ git push origin main
 | Pytest         | Testing                        |
 | GitHub Actions | CI/CD                          |
 
+
+# Version 2.0.0
+
+This release focuses on maintainability, model flexibility, safety, and token optimization.
+
+## What's New
+
+### Folder Restructuring
+
+The project structure has been reorganized to improve readability and scalability.
+
+Key improvements:
+
+* Better separation of concerns
+* Easier navigation
+* Cleaner project organization
+* Improved maintainability
+
+Example:
+
+```text
+weather-agent/
+├── agents/
+├── tools/
+├── prompts/
+├── tests/
+├── constants.py
+├── main.py
+└── README.md
+```
+
+---
+
+### OpenAI (ChatGPT) Support
+
+The assistant now supports both:
+
+* Ollama
+* OpenAI ChatGPT
+
+Configure the provider in:
+
+```python
+# constants.py
+
+SET_MODEL_PROVIDER = "openai"
+```
+
+or
+
+```python
+SET_MODEL_PROVIDER = "llama"
+```
+
+Supported OpenAI models:
+
+```python
+gpt-5
+gpt-5-mini
+gpt-5-nano
+```
+
+#### OpenAI Setup
+
+Create a `.env` file:
+
+```env
+OPENAI_API_KEY=your_openai_api_key
+```
+
+Install dependencies:
+
+```bash
+pip install langchain-openai openai python-dotenv
+```
+
+---
+
+### Weather Guardrails
+
+Added guardrails to improve safety and response quality.
+
+Features:
+
+* Weather-only scope enforcement
+* Secret and credential protection
+* Prompt and tool protection
+* Off-topic request blocking
+* Consistent recommendation behavior
+
+Non-weather requests return:
+
+```text
+I can only assist with weather-related questions.
+```
+
+---
+
+### Token Optimization
+
+Optimized prompt design and weather payload structure.
+
+Changes:
+
+* Reduced system prompt size
+* Reduced forecast payload size
+* Removed unnecessary weather attributes
+* Improved memory reuse
+* Reduced repeated weather summaries
+
+#### Results
+
+Previous:
+
+```text
+3936 tokens
+$0.002540
+```
+
+Current:
+
+```text
+2203 tokens
+$0.002001
+```
+
+Improvement:
+
+```text
+44.03% token reduction
+21.22% cost reduction
+```
+
+---
+
+## Iterations
+
+### v1.0.0
+
+* Initial LangGraph weather agent
+* Ollama integration
+* Open-Meteo integration
+* FastAPI REST API
+* LangGraph MemorySaver
+* GitHub Actions CI
+
+### v2.0.0
+
+* Project folder restructuring
+* OpenAI ChatGPT support
+* Configurable model provider
+* Weather guardrails
+* Token optimization
+* Improved memory utilization
+* Reduced API costs
+* Improved response quality
+
+
+
+
 ---
 
 # API Usage and Attribution

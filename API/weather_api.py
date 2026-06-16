@@ -10,7 +10,6 @@ from constants import (
     WEATHER_CODE_MAP,
 )
 
-
 def geocode_location(location: str) -> Dict[str, Any]:
     """
     Convert a location name into coordinates using Open-Meteo geocoding.
@@ -70,14 +69,9 @@ def fetch_current_weather(location: str) -> Dict[str, Any]:
 
     return {
         "location": f"{geo['name']}, {geo['country']}",
-        "time": current.get("time"),
         "temperature_c": current.get("temperature_2m"),
-        "apparent_temperature_c": current.get("apparent_temperature"),
-        "humidity_percent": current.get("relative_humidity_2m"),
         "precipitation_mm": current.get("precipitation"),
-        "wind_speed_kmh": current.get("wind_speed_10m"),
-        "weather_code": weather_code,
-        "condition": WEATHER_CODE_MAP.get(weather_code, "Unknown"),
+        "condition": WEATHER_CODES.get(weather_code, "Unknown")
     }
 
 
@@ -113,14 +107,19 @@ def fetch_weather_forecast(location: str, days: int = 3) -> Dict[str, Any]:
         forecast.append(
             {
                 "date": daily["time"][index],
-                "condition": WEATHER_CODE_MAP.get(weather_code, "Unknown"),
-                "temperature_max_c": daily["temperature_2m_max"][index],
-                "temperature_min_c": daily["temperature_2m_min"][index],
-                "precipitation_sum_mm": daily["precipitation_sum"][index],
-                "precipitation_probability_max_percent": daily[
+                "condition": WEATHER_CODE_MAP.get(
+                    weather_code,
+                    "Unknown"
+                ),
+                "temp_max": round(
+                    daily["temperature_2m_max"][index]
+                ),
+                "temp_min": round(
+                    daily["temperature_2m_min"][index]
+                ),
+                "rain_chance": daily[
                     "precipitation_probability_max"
                 ][index],
-                "wind_speed_max_kmh": daily["wind_speed_10m_max"][index],
             }
         )
 

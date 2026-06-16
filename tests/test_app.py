@@ -2,9 +2,9 @@ from unittest.mock import Mock, patch
 
 from fastapi.testclient import TestClient
 
-from app import app
-from agent import ask_agent
-from tools import get_current_weather
+from main import app
+from agents.weather_agent import ask_agent
+from tools.tools import get_current_weather
 
 client = TestClient(app)
 

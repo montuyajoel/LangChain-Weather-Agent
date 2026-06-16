@@ -2,7 +2,7 @@ from typing import Any, Dict
 
 from langchain.tools import tool
 
-from weather_api import fetch_current_weather, fetch_weather_forecast
+from API.weather_api import fetch_current_weather, fetch_weather_forecast
 
 
 @tool
