@@ -28,7 +28,7 @@ def test_health_check():
 # Session Cookie
 # ==========================================================
 
-@patch("app.ask_agent")
+@patch("main.ask_agent")
 def test_session_cookie_created(
     mock_ask_agent
 ):
@@ -53,7 +53,7 @@ def test_session_cookie_created(
 # Weather Endpoint
 # ==========================================================
 
-@patch("app.ask_agent")
+@patch("main.ask_agent")
 def test_weather_endpoint(
     mock_ask_agent
 ):
@@ -124,7 +124,7 @@ def test_weather_tool():
 # Conversation Memory
 # ==========================================================
 
-@patch("agent.ask_agent")
+@patch("agents.weather_agent.ask_agent")
 def test_memory_conversation(
     mock_ask_agent
 ):
@@ -166,7 +166,7 @@ def test_memory_conversation(
 # Actual Response Structure
 # ==========================================================
 
-@patch("app.ask_agent")
+@patch("main.ask_agent")
 def test_response_structure(
     mock_ask_agent
 ):
@@ -195,3 +195,61 @@ def test_response_structure(
     assert len(
         data["response"]
     ) > 0
+
+
+# ==========================================================
+# Geocoding Cache & Token Budget Middleware Tests
+# ==========================================================
+
+from API.weather_api import geocode_location, _GEOCODE_CACHE
+from agents.weather_agent import TokenBudgetMiddleware
+from langchain_core.messages import HumanMessage, RemoveMessage
+
+def test_geocode_caching():
+    # Clear cache first
+    _GEOCODE_CACHE.clear()
+
+    with patch("API.weather_api.requests.get") as mock_get:
+        mock_response = Mock()
+        mock_response.json.return_value = {
+            "results": [{
+                "name": "Paris",
+                "country": "France",
+                "latitude": 48.8566,
+                "longitude": 2.3522,
+                "timezone": "Europe/Paris"
+            }]
+        }
+        mock_get.return_value = mock_response
+
+        # Call geocode twice for the same location
+        res1 = geocode_location("Paris")
+        res2 = geocode_location("Paris")
+
+        assert res1 == res2
+        assert res1["name"] == "Paris"
+        # requests.get should only be called once due to caching
+        assert mock_get.call_count == 1
+
+def test_token_budget_middleware():
+    middleware = TokenBudgetMiddleware(max_messages=4)
+    state = {
+        "messages": [
+            HumanMessage(content="msg1", id="id1"),
+            HumanMessage(content="msg2", id="id2"),
+            HumanMessage(content="msg3", id="id3"),
+            HumanMessage(content="msg4", id="id4"),
+            HumanMessage(content="msg5", id="id5"),
+        ]
+    }
+    
+    result = middleware.before_model(state, None)
+    
+    assert result is not None
+    assert "messages" in result
+    pruned = result["messages"]
+    
+    # It should prune the oldest message (msg1) to get down to max_messages of 4
+    assert len(pruned) == 1
+    assert isinstance(pruned[0], RemoveMessage)
+    assert pruned[0].id == "id1"

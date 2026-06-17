@@ -36,6 +36,35 @@ else :
     print(f"Using LLaMA model: {DEFAULT_MODEL}")
 
 
+from langchain.agents.middleware import AgentMiddleware
+from langchain_core.messages import RemoveMessage
+
+class TokenBudgetMiddleware(AgentMiddleware):
+    """
+    Middleware that prunes conversation history when it exceeds a set message limit.
+    This ensures that token usage is bounded and doesn't grow indefinitely in long conversations.
+    """
+    def __init__(self, max_messages: int = 12):
+        super().__init__()
+        self.max_messages = max_messages
+
+    def before_model(self, state, runtime):
+        messages = state.get("messages", [])
+        if len(messages) <= self.max_messages:
+            return None
+        
+        num_to_remove = len(messages) - self.max_messages
+        remove_messages = []
+        for i in range(num_to_remove):
+            msg = messages[i]
+            if getattr(msg, "id", None):
+                remove_messages.append(RemoveMessage(id=msg.id))
+        
+        if remove_messages:
+            return {"messages": remove_messages}
+        return None
+
+
 SYSTEM_PROMPT = Path("prompts/system_prompt.md").read_text()
 
 def build_weather_agent():
@@ -58,6 +87,7 @@ def build_weather_agent():
         ],
         checkpointer=memory,
         system_prompt=SYSTEM_PROMPT,
+        middleware=[TokenBudgetMiddleware(max_messages=12)],
     )
 
     return agent

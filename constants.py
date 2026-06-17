@@ -8,19 +8,14 @@ SET_MODEL_PROVIDER =  "openai" # can be "llama" or "openai"
 
 CURRENT_WEATHER_FIELDS = [
     "temperature_2m",
-    "relative_humidity_2m",
-    "apparent_temperature",
     "precipitation",
     "weather_code",
-    "wind_speed_10m",
 ]
 
 DAILY_FORECAST_FIELDS = [
     "temperature_2m_max",
     "temperature_2m_min",
-    "precipitation_sum",
     "precipitation_probability_max",
-    "wind_speed_10m_max",
     "weather_code",
 ]
 
