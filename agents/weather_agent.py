@@ -1,4 +1,5 @@
 import os
+import logging
 from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langgraph.checkpoint.memory import MemorySaver
@@ -9,31 +10,35 @@ from tools.tools import get_current_weather, get_weather_forecast
 from tools.token_usage import get_billable_tokens, get_estimated_cost
 from pathlib import Path
 
+# Configure logger
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # Load environment variables from .env file
 load_dotenv(override=True)
 api_key = os.getenv("OPENAI_API_KEY")
 
 # Check if the OPENAI_API_KEY is set and valid
 if not api_key:
-    print("Warning: OPENAI_API_KEY is not set. OpenAI models will not work.")
+    logger.warning("OPENAI_API_KEY is not set. OpenAI models will not work.")
 elif not api_key.startswith("sk-proj-"):
-    print("Warning: OPENAI_API_KEY is not in the correct format.")
-    print("Ollama will be employed as the default model provider.")
+    logger.warning("OPENAI_API_KEY is not in the correct format.")
+    logger.warning("Ollama will be employed as the default model provider.")
 elif api_key.strip() != api_key:
-    print("Warning: OPENAI_API_KEY has leading or trailing whitespace.")
-    print("Ollama will be employed as the default model provider.")
+    logger.warning("OPENAI_API_KEY has leading or trailing whitespace.")
+    logger.warning("Ollama will be employed as the default model provider.")
 else:
-    print("OPENAI_API_KEY is set correctly.")
+    logger.info("OPENAI_API_KEY is set correctly.")
 
 # Set the model provider based on the configuration
 if SET_MODEL_PROVIDER == "openai" and api_key:
     MODEL_PROVIDER = ChatOpenAI
     DEFAULT_MODEL = DEFAULT_MODEL_OPENAI
-    print(f"Using OpenAI model: {DEFAULT_MODEL}")
-else :
+    logger.info(f"Using OpenAI model: {DEFAULT_MODEL}")
+else:
     MODEL_PROVIDER = ChatOllama
     DEFAULT_MODEL = DEFAULT_MODEL_LLAMA
-    print(f"Using LLaMA model: {DEFAULT_MODEL}")
+    logger.info(f"Using LLaMA model: {DEFAULT_MODEL}")
 
 
 from langchain.agents.middleware import AgentMiddleware
@@ -65,7 +70,8 @@ class TokenBudgetMiddleware(AgentMiddleware):
         return None
 
 
-SYSTEM_PROMPT = Path("prompts/system_prompt.md").read_text()
+BASE_DIR = Path(__file__).resolve().parent.parent
+SYSTEM_PROMPT = (BASE_DIR / "prompts" / "system_prompt.md").read_text(encoding="utf-8")
 
 def build_weather_agent():
     """
@@ -123,7 +129,7 @@ def ask_agent(
     total_tokens = get_billable_tokens(result).get("total_tokens")
     estimated_cost = get_estimated_cost(result)
    
-    print(f"Total tokens used: {total_tokens} Estimated cost: {estimated_cost}.")
+    logger.info(f"Total tokens used: {total_tokens} Estimated cost: {estimated_cost}.")
     if not messages:
         return "No response generated."
 

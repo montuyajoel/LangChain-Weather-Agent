@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from agents.weather_agent import build_weather_agent, ask_agent
 from starlette.middleware.base import BaseHTTPMiddleware
 import uuid
+import os
 
 weather_agent = None
 
@@ -42,11 +43,12 @@ class SessionMiddleware(BaseHTTPMiddleware):
 
         response = await call_next(request)
 
+        is_production = os.getenv("ENV", "development").lower() == "production"
         response.set_cookie(
             key="session_id",
             value=session_id,
             httponly=True,
-            secure=False,  # True behind HTTPS
+            secure=is_production,
             samesite="lax"
         )
 
