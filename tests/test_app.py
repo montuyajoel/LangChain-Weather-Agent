@@ -28,7 +28,7 @@ def test_health_check():
 # Session Cookie
 # ==========================================================
 
-@patch("app.ask_agent")
+@patch("main.ask_agent")
 def test_session_cookie_created(
     mock_ask_agent
 ):
@@ -53,7 +53,7 @@ def test_session_cookie_created(
 # Weather Endpoint
 # ==========================================================
 
-@patch("app.ask_agent")
+@patch("main.ask_agent")
 def test_weather_endpoint(
     mock_ask_agent
 ):
@@ -124,7 +124,7 @@ def test_weather_tool():
 # Conversation Memory
 # ==========================================================
 
-@patch("agent.ask_agent")
+@patch("agents.weather_agent.ask_agent")
 def test_memory_conversation(
     mock_ask_agent
 ):
@@ -166,7 +166,7 @@ def test_memory_conversation(
 # Actual Response Structure
 # ==========================================================
 
-@patch("app.ask_agent")
+@patch("main.ask_agent")
 def test_response_structure(
     mock_ask_agent
 ):
