@@ -10,10 +10,15 @@ from constants import (
     WEATHER_CODE_MAP,
 )
 
+_GEOCODE_CACHE: Dict[str, Dict[str, Any]] = {}
+
 def geocode_location(location: str) -> Dict[str, Any]:
     """
     Convert a location name into coordinates using Open-Meteo geocoding.
     """
+    loc_key = location.strip().lower()
+    if loc_key in _GEOCODE_CACHE:
+        return _GEOCODE_CACHE[loc_key]
 
     response = requests.get(
         OPEN_METEO_GEOCODING_URL,
@@ -34,13 +39,16 @@ def geocode_location(location: str) -> Dict[str, Any]:
 
     result = data["results"][0]
 
-    return {
+    geo_data = {
         "name": result.get("name"),
         "country": result.get("country"),
         "latitude": result["latitude"],
         "longitude": result["longitude"],
         "timezone": result.get("timezone", "auto"),
     }
+
+    _GEOCODE_CACHE[loc_key] = geo_data
+    return geo_data
 
 
 def fetch_current_weather(location: str) -> Dict[str, Any]:
