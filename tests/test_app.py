@@ -195,8 +195,6 @@ def test_response_structure(
     assert len(
         data["response"]
     ) > 0
-
-
 # ==========================================================
 # Geocoding Cache & Token Budget Middleware Tests
 # ==========================================================
