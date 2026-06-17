@@ -1,6 +1,7 @@
 requests
 langchain
 langchain-ollama
+langchain-openai
 
 fastapi
 uvicorn[standard]

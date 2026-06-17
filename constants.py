@@ -1,7 +1,10 @@
 OPEN_METEO_GEOCODING_URL = "https://geocoding-api.open-meteo.com/v1/search"
 OPEN_METEO_FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
 
-DEFAULT_MODEL = "llama3.2:3b"
+DEFAULT_MODEL_LLAMA = "llama3.2:3b"
+DEFAULT_MODEL_OPENAI = "gpt-5-mini"
+
+SET_MODEL_PROVIDER =  "openai" # can be "llama" or "openai"
 
 CURRENT_WEATHER_FIELDS = [
     "temperature_2m",

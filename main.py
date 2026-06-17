@@ -1,13 +1,11 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
-from agent import build_weather_agent, ask_agent
+from agents.weather_agent import build_weather_agent, ask_agent
 from starlette.middleware.base import BaseHTTPMiddleware
-
 import uuid
 
 weather_agent = None
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -19,21 +17,17 @@ async def lifespan(app: FastAPI):
 
     weather_agent = None
 
-
 app = FastAPI(
     title="Weather Agent API",
     version="1.0.0",
     lifespan=lifespan
 )
 
-
 class WeatherRequest(BaseModel):
     question: str
 
-
 class WeatherResponse(BaseModel):
     response: str
-
 
 class SessionMiddleware(BaseHTTPMiddleware):
 
