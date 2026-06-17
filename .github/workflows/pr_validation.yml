@@ -1,3 +1,4 @@
+```yaml
 name: PR Validation
 
 on:
@@ -5,6 +6,9 @@ on:
     branches:
       - main
       - develop
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   test:
@@ -44,3 +48,4 @@ jobs:
       - name: Success
         if: success()
         run: echo "All tests passed."
+```
