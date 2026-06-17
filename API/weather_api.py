@@ -71,7 +71,7 @@ def fetch_current_weather(location: str) -> Dict[str, Any]:
         "location": f"{geo['name']}, {geo['country']}",
         "temperature_c": current.get("temperature_2m"),
         "precipitation_mm": current.get("precipitation"),
-        "condition": WEATHER_CODES.get(weather_code, "Unknown")
+        "condition": WEATHER_CODE_MAP.get(weather_code, "Unknown")
     }
 
 
