@@ -47,4 +47,3 @@ jobs:
       - name: Success
         if: success()
         run: echo "All tests passed."
-```
